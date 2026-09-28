@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Avaliações dos Produtos</title>
+</head>
+
+<body>
+    <h1>Avaliações dos Produtos</h1>
+
+    <p>
+        Consulte os produtos para descobrir o identificador
+        do produto que deseja avaliar.
+    </p>
+
+    <p>
+        <a href="/produtos" target="_blank">Consultar produtos</a>
+    </p>
+
+    <h2>Cadastrar avaliação</h2>
+
+    <form action="/avaliacoes/cadastrar" method="POST">
+        <p>
+            <label for="produtoId">ID do produto:</label>
+
+            <input
+                type="number"
+                id="produtoId"
+                name="produtoId"
+                min="1"
+                step="1"
+                required
+            >
+        </p>
+
+        <p>
+            <label for="usuario">Seu nome:</label>
+
+            <input
+                type="text"
+                id="usuario"
+                name="usuario"
+                required
+            >
+        </p>
+
+        <p>
+            <label for="nota">Nota de 1 a 5:</label>
+
+            <input
+                type="number"
+                id="nota"
+                name="nota"
+                min="1"
+                max="5"
+                step="1"
+                required
+            >
+        </p>
+
+        <p>
+            <label for="comentario">Comentário:</label>
+
+            <textarea
+                id="comentario"
+                name="comentario"
+                rows="4"
+                required
+            ></textarea>
+        </p>
+
+        <button type="submit">Cadastrar avaliação</button>
+    </form>
+
+    <h2>Consultar avaliações</h2>
+
+    <p>
+        <a href="/avaliacoes">Consultar todas as avaliações</a>
+    </p>
+
+    <h2>Consultar avaliações de um produto</h2>
+
+    <form action="/avaliacoes" method="GET">
+        <label for="produtoConsulta">ID do produto:</label>
+
+        <input
+            type="number"
+            id="produtoConsulta"
+            name="produtoId"
+            min="1"
+            step="1"
+            required
+        >
+
+        <button type="submit">Consultar</button>
+    </form>
+
+        <h2>Alterar avaliação</h2>
+
+    <p>
+        Consulte as avaliações e copie o campo _id da avaliação
+        que deseja alterar, sem as aspas.
+    </p>
+
+    <p>
+        Preencha o nome, a nota e o comentário completos.
+        O produto associado será mantido.
+    </p>
+
+    <form action="/avaliacoes/alterar" method="POST">
+        <p>
+            <label for="idAlterar">ID da avaliação:</label>
+
+            <input
+                type="text"
+                id="idAlterar"
+                name="id"
+                required
+            >
+        </p>
+
+        <p>
+            <label for="usuarioAlterar">Seu nome:</label>
+
+            <input
+                type="text"
+                id="usuarioAlterar"
+                name="usuario"
+                required
+            >
+        </p>
+
+        <p>
+            <label for="notaAlterar">Nova nota de 1 a 5:</label>
+
+            <input
+                type="number"
+                id="notaAlterar"
+                name="nota"
+                min="1"
+                max="5"
+                step="1"
+                required
+            >
+        </p>
+
+        <p>
+            <label for="comentarioAlterar">Comentário:</label>
+
+            <textarea
+                id="comentarioAlterar"
+                name="comentario"
+                rows="4"
+                required
+            ></textarea>
+        </p>
+
+        <button type="submit">Salvar alteração</button>
+    </form>
+
+    <h2>Excluir avaliação</h2>
+
+    <p>A exclusão remove a avaliação do MongoDB.</p>
+
+    <form action="/avaliacoes/excluir" method="POST">
+        <label for="idExcluir">ID da avaliação:</label>
+
+        <input
+            type="text"
+            id="idExcluir"
+            name="id"
+            required
+        >
+
+        <button type="submit">Excluir avaliação</button>
+    </form>
+
+    <p>
+        <a href="/">Voltar à página inicial</a>
+    </p>
+</body>
+</html>

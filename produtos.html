@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Cadastro de Produtos</title>
+</head>
+
+<body>
+    <h1>Cadastro de Produtos</h1>
+
+    <p>
+        Antes de cadastrar um produto, consulte os identificadores
+        da categoria e do vendedor que serão utilizados.
+    </p>
+
+    <p>
+        <a href="/categorias" target="_blank">
+            Consultar categorias
+        </a>
+    </p>
+
+    <p>
+        <a href="/vendedores" target="_blank">
+            Consultar vendedores
+        </a>
+    </p>
+
+    <form action="/produtos/cadastrar" method="POST">
+        <p>
+            <label for="nome">Nome do produto:</label>
+
+            <input
+                type="text"
+                id="nome"
+                name="nome"
+                maxlength="255"
+                required
+            >
+        </p>
+
+        <p>
+            <label for="descricao">Descrição:</label>
+
+            <textarea
+                id="descricao"
+                name="descricao"
+                rows="4"
+            ></textarea>
+        </p>
+
+        <p>
+            <label for="preco">Preço:</label>
+
+            <input
+                type="number"
+                id="preco"
+                name="preco"
+                min="0.01"
+                step="0.01"
+                required
+            >
+        </p>
+
+        <p>
+            <label for="categoriaId">ID da categoria:</label>
+
+            <input
+                type="number"
+                id="categoriaId"
+                name="categoriaId"
+                min="1"
+                step="1"
+                required
+            >
+        </p>
+
+        <p>
+            <label for="vendedorId">ID do vendedor:</label>
+
+            <input
+                type="number"
+                id="vendedorId"
+                name="vendedorId"
+                min="1"
+                step="1"
+                required
+            >
+        </p>
+
+        <button type="submit">Cadastrar produto</button>
+    </form>
+
+    <p>
+        <a href="/produtos">Consultar produtos cadastrados</a>
+    </p>
+
+        <h2>Buscar produto pelo ID</h2>
+    <form action="/produtos/buscar" method="GET">
+        <label for="idBuscar">ID do produto:</label>
+
+        <input
+            type="number"
+            id="idBuscar"
+            name="id"
+            min="1"
+            step="1"
+            required
+        >
+
+        <button type="submit">Buscar produto</button>
+    </form>
+
+    <h2>Filtrar produtos</h2>
+
+    <p>
+        Preencha um ou os dois filtros.
+        Deixe ambos vazios para consultar todos os produtos.
+    </p>
+
+    <form action="/produtos" method="GET">
+        <p>
+            <label for="categoriaFiltro">ID da categoria:</label>
+
+            <input
+                type="number"
+                id="categoriaFiltro"
+                name="categoriaId"
+                min="1"
+                step="1"
+            >
+        </p>
+
+        <p>
+            <label for="precoFiltro">
+                Mostrar produtos com preço acima de:
+            </label>
+
+            <input
+                type="number"
+                id="precoFiltro"
+                name="precoMinimo"
+                min="0"
+                step="0.01"
+            >
+        </p>
+
+        <button type="submit">Consultar produtos</button>
+    </form>
+
+    <p>Os resultados serão ordenados pelo nome de A a Z.</p>
+
+    <h2>Alterar produto</h2>
+
+    <p>
+        Consulte os produtos para conferir o ID e os dados atuais.
+        Preencha todos os campos obrigatórios abaixo,
+        inclusive os valores que deseja manter.
+    </p>
+
+    <form action="/produtos/alterar" method="POST">
+        <p>
+            <label for="idAlterar">ID do produto:</label>
+
+            <input
+                type="number"
+                id="idAlterar"
+                name="id"
+                min="1"
+                step="1"
+                required
+            >
+        </p>
+
+        <p>
+            <label for="nomeAlterar">Nome:</label>
+
+            <input
+                type="text"
+                id="nomeAlterar"
+                name="nome"
+                maxlength="255"
+                required
+            >
+        </p>
+
+        <p>
+            <label for="descricaoAlterar">Descrição:</label>
+
+            <textarea
+                id="descricaoAlterar"
+                name="descricao"
+                rows="4"
+            ></textarea>
+        </p>
+
+        <p>
+            <label for="precoAlterar">Preço:</label>
+
+            <input
+                type="number"
+                id="precoAlterar"
+                name="preco"
+                min="0.01"
+                step="0.01"
+                required
+            >
+        </p>
+
+        <p>
+            <label for="categoriaAlterar">ID da categoria:</label>
+
+            <input
+                type="number"
+                id="categoriaAlterar"
+                name="categoriaId"
+                min="1"
+                step="1"
+                required
+            >
+        </p>
+
+        <p>
+            <label for="vendedorAlterar">ID do vendedor:</label>
+
+            <input
+                type="number"
+                id="vendedorAlterar"
+                name="vendedorId"
+                min="1"
+                step="1"
+                required
+            >
+        </p>
+
+        <button type="submit">Salvar alteração</button>
+    </form>
+
+    <h2>Excluir produto</h2>
+
+    <p>A exclusão remove o produto do banco de dados.</p>
+
+    <form action="/produtos/excluir" method="POST">
+        <label for="idExcluir">ID do produto:</label>
+
+        <input
+            type="number"
+            id="idExcluir"
+            name="id"
+            min="1"
+            step="1"
+            required
+        >
+
+        <button type="submit">Excluir produto</button>
+    </form>
+
+    <p>
+        <a href="/">Voltar à página inicial</a>
+    </p>
+</body>
+</html>

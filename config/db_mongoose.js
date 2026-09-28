@@ -1,0 +1,5 @@
+const db_mongoose = {
+    connection: 'mongodb://127.0.0.1:27017/catalogo_avaliacoes'
+};
+
+module.exports = db_mongoose;

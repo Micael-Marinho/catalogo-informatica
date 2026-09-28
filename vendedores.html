@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Gerenciar Vendedores</title>
+</head>
+
+<body>
+    <h1>Gerenciar Vendedores</h1>
+
+    <h2>Cadastrar vendedor</h2>
+
+    <form action="/vendedores/cadastrar" method="POST">
+        <label for="nome">Nome:</label>
+
+        <input
+            type="text"
+            id="nome"
+            name="nome"
+            maxlength="255"
+            required
+        >
+
+        <button type="submit">Cadastrar</button>
+    </form>
+
+    <h2>Consultar vendedores</h2>
+
+    <p>
+        <a href="/vendedores">Consultar vendedores cadastrados</a>
+    </p>
+
+    <h2>Alterar vendedor</h2>
+
+    <form action="/vendedores/alterar" method="POST">
+        <p>
+            <label for="idAlterar">ID do vendedor:</label>
+
+            <input
+                type="number"
+                id="idAlterar"
+                name="id"
+                min="1"
+                step="1"
+                required
+            >
+        </p>
+
+        <p>
+            <label for="nomeAlterar">Novo nome:</label>
+
+            <input
+                type="text"
+                id="nomeAlterar"
+                name="nome"
+                maxlength="255"
+                required
+            >
+        </p>
+
+        <button type="submit">Salvar alteração</button>
+    </form>
+
+    <h2>Excluir vendedor</h2>
+
+    <p>A exclusão remove o vendedor do banco de dados.</p>
+
+    <form action="/vendedores/excluir" method="POST">
+        <label for="idExcluir">ID do vendedor:</label>
+
+        <input
+            type="number"
+            id="idExcluir"
+            name="id"
+            min="1"
+            step="1"
+            required
+        >
+
+        <button type="submit">Excluir vendedor</button>
+    </form>
+
+    <p>
+        <a href="/">Voltar à página inicial</a>
+    </p>
+</body>
+</html>
