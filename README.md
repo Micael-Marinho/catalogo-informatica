@@ -4,9 +4,15 @@ Projeto 1 da disciplina **Programação Web Back-End**, desenvolvido com Node.js
 
 ## Integrantes
 
-- João Victor Queiroz de Lima / RA: 2051524
-- Micael Marinho Souza  / RA: 2819457
-- Wagner Lourenço de Oliveira Junior / RA: 2819473
+| Integrante | Registro acadêmico |
+| --- | --- |
+| Micael Marinho Souza | 2819457 |
+| Wagner Lourenço de Oliveira Junior | 2819473 |
+| João Victor Queiroz de Lima | 2051524 |
+
+**Instituição:** Universidade Tecnológica Federal do Paraná, Câmpus Cornélio Procópio.  
+**Curso:** Tecnologia em Análise e Desenvolvimento de Sistemas.  
+**Disciplina:** Programação Web Back-End, Projeto 1.
 
 ## Objetivo
 
@@ -50,7 +56,8 @@ As consultas retornam dados em JSON. Os formulários de alteração são preench
 | Caminho | Responsabilidade |
 | --- | --- |
 | `app.js` | Configuração do Express, rotas, validações e inicialização dos bancos |
-| `config/db_sequelize.js` | Conexão com o PostgreSQL, carregamento dos models e relacionamentos |
+| `config/db_sequelize.exemplo.js` | Modelo de configuração do PostgreSQL, sem senha real |
+| `config/db_sequelize.js` | Configuração local criada a partir do exemplo, com conexão, models e relacionamentos |
 | `config/db_mongoose.js` | Endereço de conexão com o MongoDB |
 | `models/categoria.js` | Model de Categoria |
 | `models/vendedor.js` | Model de Vendedor |
@@ -166,9 +173,18 @@ Essas verificações se aplicam às operações feitas pelas rotas. Não existe 
 
 O enunciado do projeto não determina versões específicas. Para reproduzir as dependências JavaScript, mantenha o arquivo `package-lock.json` junto do projeto.
 
-### 1. Instalar as dependências
+### 1. Baixar o projeto e instalar as dependências
 
-Abra a pasta do projeto no VS Code e execute no terminal:
+Clone o repositório:
+
+```bash
+git clone https://github.com/Micael-Marinho/catalogo-informatica.git
+cd catalogo-informatica
+```
+
+Também é possível baixar por **Code > Download ZIP** no GitHub, extrair o arquivo e abrir a pasta que contém `app.js` no VS Code.
+
+No terminal dessa pasta, instale as dependências:
 
 ```bash
 npm install
@@ -190,7 +206,17 @@ No pgAdmin, crie o banco:
 catalogo_informatica
 ```
 
-Em `config/db_sequelize.js`, configure os dados da conexão existente:
+O arquivo `config/db_sequelize.js` não é enviado ao GitHub porque contém a senha local. O repositório fornece `config/db_sequelize.exemplo.js` com o marcador `SUA_SENHA_AQUI`.
+
+Na pasta `config`, faça uma cópia de `db_sequelize.exemplo.js` e renomeie a cópia para `db_sequelize.js`. Mantenha o arquivo de exemplo.
+
+No PowerShell, a partir da raiz do projeto, a cópia pode ser feita assim, caso o arquivo local ainda não exista:
+
+```powershell
+Copy-Item config/db_sequelize.exemplo.js config/db_sequelize.js
+```
+
+Abra **somente a cópia local** `config/db_sequelize.js`, substitua `SUA_SENHA_AQUI` pela senha do seu PostgreSQL e confira os dados:
 
 | Informação | Valor do ambiente local |
 | --- | --- |
@@ -201,7 +227,7 @@ Em `config/db_sequelize.js`, configure os dados da conexão existente:
 | Porta | 5432 |
 | Dialeto | postgres |
 
-Não substitua todo o arquivo de configuração: ele também contém os models e relacionamentos. Antes de compartilhar o código, substitua senhas reais por um marcador e oriente quem for executar a informar a própria senha.
+Preserve o restante do arquivo: ele também carrega os models e define os relacionamentos. Mantenha `SUA_SENHA_AQUI` no arquivo de exemplo. O `.gitignore` exclui a configuração local com senha do versionamento.
 
 As tabelas dos models são criadas por `db.sequelize.sync()` quando ainda não existem. Não se utiliza `force: true`, evitando recriar e apagar as tabelas a cada execução. O `sync()` utilizado não é uma rotina de migração de estruturas existentes.
 
@@ -229,7 +255,13 @@ Essa configuração utiliza o servidor local preparado para o projeto.
 
 ### 4. Preparar o diretório de logs
 
-Crie a pasta `logs` na raiz do projeto, ao lado de `app.js` e `registrarErro.js`, caso ela ainda não exista. O arquivo `errors.log` será criado no primeiro registro de erro.
+Crie a pasta `logs` na raiz do projeto, ao lado de `app.js` e `registrarErro.js`, caso ela ainda não exista:
+
+```bash
+mkdir logs
+```
+
+A pasta de logs é ignorada pelo Git e precisa ser criada em cada nova instalação. Não é necessário criar `errors.log` manualmente: `fs.appendFile()` cria esse arquivo na primeira gravação de erro bem-sucedida. Sem a pasta, a gravação falha.
 
 ### 5. Executar a aplicação
 
@@ -246,6 +278,8 @@ Abra no navegador:
 ```text
 http://localhost:8081
 ```
+
+A execução é local e exige que o terminal permaneça aberto. A publicação no GitHub disponibiliza o código, mas não inicia o servidor Node.js nem os bancos. Use `node app.js`: o projeto não possui um script `npm start` configurado. Abra a aplicação pelo endereço acima, sem usar Live Server ou abrir o HTML por duplo clique.
 
 Para encerrar, pressione `Ctrl + C` no terminal que está executando o servidor. Após alterar arquivos JavaScript, salve e reinicie a aplicação. Mantenha apenas uma execução utilizando a porta 8081.
 
@@ -352,7 +386,7 @@ Exemplo de registro:
 
 As datas são gravadas em UTC com `toISOString()`. Os novos registros são acrescentados ao arquivo, preservando os anteriores. Validações que retornam uma resposta antes de ocorrer uma exceção não geram automaticamente um registro no log.
 
-## Roteiro de verificação manual
+## Verificação manual
 
 1. Cadastrar uma categoria e um vendedor.
 2. Consultar os identificadores gerados.
@@ -366,7 +400,21 @@ As datas são gravadas em UTC com `toISOString()`. Os novos registros são acres
 10. Excluir a categoria e o vendedor de teste quando não possuírem produtos associados.
 11. Enviar `abc` no formulário de exclusão de avaliação e conferir a mensagem de ID inválido e o registro em `logs/errors.log`.
 
+O projeto não possui uma suíte de testes automatizados configurada. A verificação das funcionalidades é manual.
+
 Utilizar registros de teste para exclusões. Os identificadores devem ser consultados, pois não se deve presumir que terão valores específicos.
+
+## Arquivos locais e versionamento
+
+O repositório inclui o código-fonte, os HTMLs, `package.json`, `package-lock.json`, a configuração de exemplo e esta documentação.
+
+O `.gitignore` mantém fora do versionamento:
+
+- `node_modules/`: dependências instaladas pelo npm.
+- `config/db_sequelize.js`: configuração local com a senha do PostgreSQL.
+- `logs/` e arquivos de log: histórico gerado durante a execução.
+
+Os dados dos bancos não acompanham o repositório. Em uma instalação nova, prepare os bancos, configure a conexão e cadastre os registros pela aplicação.
 
 ## Base do desenvolvimento
 
