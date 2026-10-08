@@ -29,7 +29,7 @@ Aplicar os conteúdos de desenvolvimento Back-End e persistência de dados em um
 | pg | Comunicação do Sequelize com o PostgreSQL |
 | MongoDB Community Server | Persistência dos documentos de avaliação |
 | Mongoose | Schema, model e operações no MongoDB |
-| HTML | Páginas e formulários |
+| HTML, CSS e JavaScript no navegador | Interface Bancada, formulários, tabelas e requisições com fetch |
 | fs e path | Gravação de logs e construção de caminhos de arquivos |
 
 As dependências do projeto são registradas em `package.json` e `package-lock.json`. Os módulos `fs` e `path` já fazem parte do Node.js.
@@ -49,7 +49,7 @@ As dependências do projeto são registradas em `package.json` e `package-lock.j
 - Verificar se há avaliações antes de excluir um produto.
 - Registrar exceções em `logs/errors.log`.
 
-As consultas retornam dados em JSON. Os formulários de alteração são preenchidos manualmente com os dados completos; não existe preenchimento automático. O nome informado na avaliação é um campo de texto, sem autenticação de usuário.
+As rotas de consulta retornam JSON. A interface Bancada, em `paginas/`, utiliza JavaScript e `fetch()` para exibir esses dados em tabelas, preencher seletores e carregar os dados no formulário ao clicar em **Editar**. Os cadastros e alterações são enviados por POST. O nome informado na avaliação é um campo de texto, sem autenticação de usuário. O navegador precisa estar com JavaScript habilitado.
 
 ## Organização dos arquivos
 
@@ -65,11 +65,11 @@ As consultas retornam dados em JSON. Os formulários de alteração são preench
 | `models/avaliacao.js` | Schema e model de Avaliação |
 | `registrarErro.js` | Classe RegistroErro e função de gravação de logs |
 | `logs/errors.log` | Histórico de exceções; criado na primeira gravação |
-| `index.html` | Página inicial com acesso aos formulários |
-| `categorias.html` | Formulários de categorias |
-| `vendedores.html` | Formulários de vendedores |
-| `produtos.html` | Formulários de produtos e consultas |
-| `avaliacoes.html` | Formulários de avaliações |
+| `paginas/index.html` | Página inicial com acesso aos formulários |
+| `paginas/categorias.html` | Formulários de categorias |
+| `paginas/vendedores.html` | Formulários de vendedores |
+| `paginas/produtos.html` | Formulários de produtos e consultas |
+| `paginas/avaliacoes.html` | Formulários de avaliações |
 | `package.json` | Informações e dependências do projeto |
 | `package-lock.json` | Registro das versões resolvidas das dependências |
 | `README.md` | Documentação do projeto |
@@ -162,86 +162,169 @@ O campo `produtoId` não cria uma chave estrangeira entre PostgreSQL e MongoDB. 
 
 Essas verificações se aplicam às operações feitas pelas rotas. Não existe uma transação conjunta entre os bancos nem proteção contra todas as situações de acesso simultâneo ou alterações diretas nas ferramentas de banco.
 
-## Preparação do ambiente
+## Instalação e configuração do zero (Windows)
 
-É necessário ter:
+Este roteiro usa os bancos locais, sem MongoDB Atlas e sem hospedagem. Execute as etapas na ordem apresentada. Se os programas já estiverem instalados, confira suas versões e avance para a configuração do projeto.
 
-- Node.js e npm instalados.
-- PostgreSQL instalado e em execução.
-- MongoDB Community Server instalado e em execução.
-- pgAdmin e MongoDB Compass para configurar e visualizar os bancos.
+### 1. O que baixar
 
-O enunciado do projeto não determina versões específicas. Para reproduzir as dependências JavaScript, mantenha o arquivo `package-lock.json` junto do projeto.
+| Programa | Download oficial | Para que serve |
+| --- | --- | --- |
+| Node.js | [nodejs.org](https://nodejs.org/pt-br/download) | Executar o servidor; o instalador inclui o npm |
+| PostgreSQL | [Instalador para Windows](https://www.postgresql.org/download/windows/) | Armazenar categorias, vendedores e produtos |
+| pgAdmin | Incluído entre os componentes do instalador do PostgreSQL | Criar e consultar o banco relacional |
+| MongoDB Community Server | [Download do servidor](https://www.mongodb.com/try/download/community) | Armazenar as avaliações |
+| MongoDB Compass | [Download do Compass](https://www.mongodb.com/try/download/compass) | Visualizar o banco MongoDB e seus documentos |
+| Visual Studio Code | [Download do VS Code](https://code.visualstudio.com/download) | Abrir os arquivos e usar o terminal; pode ser substituído por outro editor |
+| Git (opcional) | [Git para Windows](https://git-scm.com/downloads/win) | Clonar o repositório; dispensável se usar Download ZIP |
 
-### 1. Baixar o projeto e instalar as dependências
+**Compatibilidade:** o projeto utiliza Mongoose 9, que exige **Node.js 20.19.0 ou superior**. Para uma instalação nova, utilize uma versão LTS ainda suportada, como Node.js 24.x. O requisito mínimo não significa que qualquer versão antiga ainda receba suporte. Consulte a [documentação de migração do Mongoose 9](https://mongoosejs.com/docs/migrating_to_9.html).
 
-Clone o repositório:
+Para acompanhar este roteiro, utilize PostgreSQL 17.x e MongoDB Community Server 8.0.x, com versões de manutenção disponíveis para seu sistema. Essas linhas orientam a preparação dos bancos; não representam uma exigência de versão da professora nem uma declaração de teste de todas as versões possíveis. As versões exatas das dependências JavaScript estão registradas no `package-lock.json`.
 
-```bash
-git clone https://github.com/Micael-Marinho/catalogo-informatica.git
-cd catalogo-informatica
-```
+**Atenção:** Compass é a interface de consulta. Instalar apenas o Compass não instala necessariamente o servidor MongoDB. O projeto precisa do **Community Server em execução**.
 
-Também é possível baixar por **Code > Download ZIP** no GitHub, extrair o arquivo e abrir a pasta que contém `app.js` no VS Code.
+### 2. Instalar e conferir o Node.js
 
-No terminal dessa pasta, instale as dependências:
-
-```bash
-npm install
-```
-
-Se o PowerShell bloquear `npm.ps1`, utilize:
-
-```powershell
-npm.cmd install
-```
-
-Não é necessário enviar a pasta `node_modules` junto com o projeto. Ela é criada pela instalação das dependências.
-
-### 2. Preparar o PostgreSQL
-
-No pgAdmin, crie o banco:
-
-```text
-catalogo_informatica
-```
-
-O arquivo `config/db_sequelize.js` não é enviado ao GitHub porque contém a senha local. O repositório fornece `config/db_sequelize.exemplo.js` com o marcador `SUA_SENHA_AQUI`.
-
-Na pasta `config`, faça uma cópia de `db_sequelize.exemplo.js` e renomeie a cópia para `db_sequelize.js`. Mantenha o arquivo de exemplo.
-
-No PowerShell, a partir da raiz do projeto, a cópia pode ser feita assim, caso o arquivo local ainda não exista:
+1. Baixe o instalador do Node.js para Windows, na versão LTS compatível.
+2. Execute o instalador e mantenha os componentes padrão, incluindo npm e inclusão no PATH.
+3. Conclua a instalação. Feche e abra novamente o VS Code, caso já estivesse aberto.
+4. Abra um terminal e execute, separadamente:
 
 ```powershell
-Copy-Item config/db_sequelize.exemplo.js config/db_sequelize.js
+node -v
+npm -v
 ```
 
-Abra **somente a cópia local** `config/db_sequelize.js`, substitua `SUA_SENHA_AQUI` pela senha do seu PostgreSQL e confira os dados:
+Os dois comandos devem mostrar números de versão. Confira se o Node atende ao requisito indicado acima.
 
-| Informação | Valor do ambiente local |
-| --- | --- |
-| Banco | catalogo_informatica |
-| Usuário | postgres, ou o usuário configurado no ambiente |
-| Senha | Senha local desse usuário |
-| Host | localhost |
-| Porta | 5432 |
-| Dialeto | postgres |
+Se o PowerShell apresentar bloqueio de `npm.ps1`, use `npm.cmd -v`. Nos demais comandos deste guia, também é possível substituir `npm` por `npm.cmd`, sem alterar a política de execução do Windows.
 
-Preserve o restante do arquivo: ele também carrega os models e define os relacionamentos. Mantenha `SUA_SENHA_AQUI` no arquivo de exemplo. O `.gitignore` exclui a configuração local com senha do versionamento.
+### 3. Instalar o PostgreSQL
 
-As tabelas dos models são criadas por `db.sequelize.sync()` quando ainda não existem. Não se utiliza `force: true`, evitando recriar e apagar as tabelas a cada execução. O `sync()` utilizado não é uma rotina de migração de estruturas existentes.
+1. No site oficial, abra o link do instalador para Windows fornecido pela EDB.
+2. Execute o instalador e mantenha os componentes **PostgreSQL Server**, **pgAdmin 4** e **Command Line Tools**.
+3. Mantenha os diretórios padrão, salvo se precisar de outro local.
+4. Defina e guarde a senha do usuário `postgres`. Essa senha será utilizada na configuração local do projeto.
+5. Mantenha a porta **5432**, se estiver livre.
+6. Na opção de localidade, mantenha **Default locale**, se disponível.
+7. Conclua a instalação. O **Stack Builder é opcional**: este projeto não precisa instalar nenhum complemento por ele.
 
-### 3. Preparar o MongoDB
+Se já houver PostgreSQL instalado, utilize o servidor existente e confira usuário, senha e porta. Não é necessário instalar outra instância apenas para este projeto.
 
-No Compass, conecte usando:
+### 4. Criar o banco no pgAdmin
+
+1. Abra o **pgAdmin 4**.
+2. Expanda **Servers** e abra o servidor PostgreSQL instalado. Informe a senha do usuário `postgres` quando solicitada.
+3. Clique com o botão direito em **Databases**.
+4. Selecione **Create > Database**.
+5. No campo **Database**, digite exatamente `catalogo_informatica`.
+6. Mantenha `postgres` como proprietário, se esse for o usuário utilizado.
+7. Clique em **Save**.
+
+Se o servidor não aparecer, clique com o botão direito em **Servers > Register > Server**. Na aba **General**, informe um nome, como `PostgreSQL local`. Em **Connection**, preencha host `localhost`, porta `5432`, maintenance database `postgres`, usuário `postgres` e a senha definida na instalação. Salve e crie o banco pelos passos acima.
+
+Não crie as tabelas manualmente. Na primeira inicialização, `db.sequelize.sync()` cria as tabelas dos models que ainda não existem. O banco `catalogo_informatica`, porém, precisa existir antes de executar o projeto.
+
+### 5. Instalar o MongoDB Community Server
+
+1. Baixe o instalador **MSI** do MongoDB Community Server para Windows, compatível com seu sistema.
+2. Execute o instalador e selecione a instalação **Complete**.
+3. Mantenha a opção **Install MongoD as a Service**, para executar o banco como serviço do Windows.
+4. Mantenha a conta de serviço e os diretórios padrão sugeridos pelo instalador.
+5. Se houver a opção de instalar o Compass, pode mantê-la selecionada. Caso contrário, instale o Compass pelo link da etapa 1.
+6. Conclua a instalação.
+
+Para conferir o serviço, pressione `Win + R`, digite `services.msc` e pressione Enter. Procure **MongoDB** ou **MongoDB Server**. O serviço deve estar em execução; se estiver parado, use **Iniciar**. Os nomes das telas podem variar conforme a versão.
+
+### 6. Preparar o banco no Compass
+
+1. Abra o **MongoDB Compass**.
+2. Crie uma conexão local usando a URI abaixo e clique em **Connect**:
 
 ```text
 mongodb://127.0.0.1:27017
 ```
 
-Crie o banco `catalogo_avaliacoes` e a collection `avaliacoes`.
+3. Após conectar, utilize **Create Database** ou o botão de criação de banco disponível na interface.
+4. Preencha **Database Name** com `catalogo_avaliacoes`.
+5. Preencha **Collection Name** com `avaliacoes`.
+6. Confirme a criação.
 
-O arquivo `config/db_mongoose.js` deve conter:
+Se o banco e a coleção já existirem, utilize-os. Não é necessário cadastrar documentos manualmente: as avaliações serão inseridas pela aplicação. Criar o banco pelo Compass torna a preparação visível; o MongoDB também pode criar o banco e a coleção quando a aplicação grava os dados.
+
+### 7. Baixar e abrir o projeto
+
+**Opção A — ZIP, sem precisar instalar Git:**
+
+1. Acesse [o repositório do projeto](https://github.com/Micael-Marinho/catalogo-informatica).
+2. Clique em **Code > Download ZIP**.
+3. Extraia o ZIP para uma pasta do computador. Não execute os arquivos dentro do ZIP.
+4. No VS Code, utilize **File > Open Folder** ou **Arquivo > Abrir Pasta**.
+5. Selecione a pasta extraída que contém diretamente `app.js` e `package.json`.
+6. Abra **Terminal > New Terminal** ou **Terminal > Novo Terminal**.
+
+**Opção B — Git, caso esteja instalado:**
+
+```powershell
+git clone https://github.com/Micael-Marinho/catalogo-informatica.git
+cd catalogo-informatica
+```
+
+Em ambas as opções, os comandos seguintes devem ser executados na pasta que contém `app.js` e `package.json`.
+
+Os cinco HTMLs ficam na pasta **`paginas/`**: `index.html`, `categorias.html`, `vendedores.html`, `produtos.html` e `avaliacoes.html`. O `app.js` permanece na raiz e suas cinco rotas de páginas usam `path.join(__dirname, 'paginas', ...)`. Preserve essa estrutura ao extrair ou copiar o projeto. O CSS e o JavaScript da interface estão nos próprios HTMLs.
+
+### 8. Instalar as dependências do projeto
+
+No terminal da pasta do projeto, execute:
+
+```powershell
+npm ci
+```
+
+Esse comando instala as dependências conforme o `package-lock.json`, sem atualizar suas versões. Requer que o arquivo de lock esteja presente e corresponda ao `package.json`. Em uma cópia que já contém `node_modules`, essa pasta é substituída pela instalação.
+
+Se ocorrer bloqueio de `npm.ps1`, execute:
+
+```powershell
+npm.cmd ci
+```
+
+Aguarde a conclusão. A pasta `node_modules` será criada automaticamente. Não é necessário instalar Express, Sequelize ou Mongoose um por um. Não modifique as versões das dependências para seguir este roteiro.
+
+### 9. Configurar a conexão com o PostgreSQL
+
+O arquivo `config/db_sequelize.js` contém a senha local e não acompanha o repositório. Para criá-lo:
+
+1. Abra a pasta `config`.
+2. Copie `db_sequelize.exemplo.js`.
+3. Renomeie **a cópia** para `db_sequelize.js`, mantendo o arquivo de exemplo original.
+
+Se a configuração local ainda não existir, a cópia também pode ser feita pelo PowerShell, na raiz do projeto:
+
+```powershell
+Copy-Item config/db_sequelize.exemplo.js config/db_sequelize.js
+```
+
+Abra **somente `config/db_sequelize.js`** e substitua `SUA_SENHA_AQUI` pela senha definida ao instalar o PostgreSQL. Confira:
+
+| Informação | Valor padrão do projeto |
+| --- | --- |
+| Banco | `catalogo_informatica` |
+| Usuário | `postgres` |
+| Senha | A senha do PostgreSQL instalado no computador |
+| Host | `localhost` |
+| Porta | `5432` |
+| Dialeto | `postgres` |
+
+Se seu servidor utiliza outro usuário ou porta, ajuste esses valores no arquivo local. A senha precisa permanecer uma string JavaScript válida; se contiver aspas ou barras invertidas, esses caracteres precisam ser escapados corretamente.
+
+**Preserve o restante do arquivo:** ele carrega os models e define os relacionamentos. Não substitua todo o conteúdo apenas por um trecho de conexão. Mantenha o marcador `SUA_SENHA_AQUI` no arquivo de exemplo e não publique a senha real.
+
+### 10. Conferir a conexão com o MongoDB
+
+O arquivo `config/db_mongoose.js` já deve conter:
 
 ```javascript
 const db_mongoose = {
@@ -251,27 +334,38 @@ const db_mongoose = {
 module.exports = db_mongoose;
 ```
 
-Essa configuração utiliza o servidor local preparado para o projeto.
+No ambiente local padrão preparado neste guia, não é necessário alterar esse arquivo. O endereço utiliza o mesmo servidor da conexão feita no Compass, acrescentando o nome do banco.
 
-### 4. Preparar o diretório de logs
+### 11. Criar a pasta de logs
 
-Crie a pasta `logs` na raiz do projeto, ao lado de `app.js` e `registrarErro.js`, caso ela ainda não exista:
+Na raiz do projeto, ao lado de `app.js` e `registrarErro.js`, crie uma pasta chamada `logs`.
 
-```bash
+Se ela ainda não existir, execute:
+
+```powershell
 mkdir logs
 ```
 
-A pasta de logs é ignorada pelo Git e precisa ser criada em cada nova instalação. Não é necessário criar `errors.log` manualmente: `fs.appendFile()` cria esse arquivo na primeira gravação de erro bem-sucedida. Sem a pasta, a gravação falha.
+A pasta é ignorada pelo Git e precisa ser criada em cada nova instalação. Não crie `errors.log` manualmente: `fs.appendFile()` cria o arquivo na primeira gravação de erro bem-sucedida. A pasta pode permanecer vazia enquanto nenhuma exceção for registrada. Sem a pasta, a gravação do log falha.
 
-### 5. Executar a aplicação
+### 12. Iniciar o sistema
 
-No terminal, dentro da pasta do projeto:
+Confira se os serviços PostgreSQL e MongoDB estão em execução. No terminal, dentro da pasta do projeto, execute:
 
-```bash
+```powershell
 node app.js
 ```
 
-A aplicação primeiro sincroniza os models do PostgreSQL, depois conecta ao MongoDB e, por fim, inicia o servidor Express na porta 8081.
+A aplicação sincroniza os models do PostgreSQL, conecta ao MongoDB e só então inicia o Express. Entre as mensagens do terminal, devem aparecer:
+
+```text
+PostgreSQL conectado e models sincronizados!
+MongoDB conectado!
+Servidor iniciado!
+Acesse: http://localhost:8081
+```
+
+Também podem aparecer comandos SQL gerados pelo Sequelize; isso faz parte da saída normal da configuração utilizada.
 
 Abra no navegador:
 
@@ -279,9 +373,58 @@ Abra no navegador:
 http://localhost:8081
 ```
 
-A execução é local e exige que o terminal permaneça aberto. A publicação no GitHub disponibiliza o código, mas não inicia o servidor Node.js nem os bancos. Use `node app.js`: o projeto não possui um script `npm start` configurado. Abra a aplicação pelo endereço acima, sem usar Live Server ou abrir o HTML por duplo clique.
+Mantenha o terminal e os serviços dos bancos em execução durante o uso. O projeto é iniciado com `node app.js`; **não possui script `npm start` configurado**. Não use Live Server nem abra os HTMLs por duplo clique.
 
-Para encerrar, pressione `Ctrl + C` no terminal que está executando o servidor. Após alterar arquivos JavaScript, salve e reinicie a aplicação. Mantenha apenas uma execução utilizando a porta 8081.
+Para encerrar, pressione `Ctrl + C` no terminal do servidor. Após alterar arquivos JavaScript, salve e reinicie a aplicação. Mantenha apenas uma execução na porta 8081.
+
+O GitHub disponibiliza o código; ele não executa o servidor nem transfere os dados dos bancos. Em uma instalação nova, cadastre os dados pela aplicação.
+
+### 13. Fazer o primeiro teste
+
+1. Na página inicial, abra o formulário de categorias e cadastre `Periféricos`.
+2. Consulte as categorias e anote o ID retornado.
+3. Cadastre o vendedor `Loja de demonstração`, consulte e anote seu ID.
+4. Cadastre `Monitor de demonstração`, descrição `Monitor para estudos`, preço `800` e selecione a categoria e o vendedor cadastrados nos campos correspondentes.
+5. Consulte os produtos e anote o ID do monitor.
+6. Cadastre uma avaliação selecionando esse produto, usuário `Equipe`, nota `5` e comentário `Produto adequado para estudos`.
+7. Consulte as avaliações e confira o documento no Compass, em `catalogo_avaliacoes > avaliacoes`. Atualize a visualização se necessário.
+
+Não presuma que os IDs serão `1`: utilize os valores apresentados nas consultas. Na interface, as consultas aparecem em tabelas. Acessar diretamente `/produtos` ou `/avaliacoes`, por exemplo, mostra o JSON retornado pelo servidor. Uma lista `[]` nessas rotas indica que a consulta não encontrou registros.
+
+Para testar o log, mantenha o servidor em execução e abra **outro terminal PowerShell**. A interface exclui pelo botão da linha e não oferece um campo livre para digitar um ID inválido. Por isso, envie esta requisição de teste diretamente à rota:
+
+```powershell
+curl.exe -i -X POST http://localhost:8081/avaliacoes/excluir -d "id=abc"
+```
+
+O resultado esperado é HTTP `400`, a mensagem de ID inválido e um registro de `CastError` em `logs/errors.log`. Esse teste usa um identificador inválido e não seleciona uma avaliação existente.
+
+A seção **Verificação manual**, abaixo, apresenta a sequência completa de testes de alteração, filtros e exclusões.
+
+### Problemas comuns
+
+| Mensagem ou situação | O que conferir |
+| --- | --- |
+| `node` ou `npm` não é reconhecido | Instalação do Node.js e inclusão no PATH. Feche e abra novamente o terminal e o VS Code. |
+| PowerShell bloqueia `npm.ps1` | Use `npm.cmd ci` e `npm.cmd -v`. |
+| `EBADENGINE` ou requisito de versão incompatível | Confira `node -v` e instale uma versão LTS compatível com o Mongoose 9. |
+| npm não encontra `package.json` | O terminal deve estar na pasta extraída que contém `app.js` e `package.json`. |
+| `npm ci` informa divergência entre pacote e lock | Baixe uma cópia completa do repositório, mantendo `package.json` e `package-lock.json` da mesma revisão. |
+| `Cannot find module 'express'` ou outra dependência | Execute `npm ci` na pasta do projeto e confira se a instalação terminou sem erro. |
+| `Cannot find module './config/db_sequelize'` | Crie `config/db_sequelize.js` a partir do arquivo de exemplo. Confira o nome e a extensão. |
+| Falha de autenticação no PostgreSQL | Confira usuário e senha em `config/db_sequelize.js`; use a senha do servidor, não uma eventual senha mestra do pgAdmin. |
+| Banco `catalogo_informatica` não existe | Crie o banco no mesmo servidor e porta usados na configuração. |
+| Conexão recusada na porta 5432 | Confira o serviço PostgreSQL, o host e a porta configurada. |
+| Conexão recusada na porta 27017 ou `MongooseServerSelectionError` | Confira se o MongoDB Community Server está instalado e em execução. Compass sozinho não substitui o servidor. |
+| `EADDRINUSE` na porta 8081 | Outra aplicação ou execução já utiliza a porta. Pare a execução conhecida com `Ctrl + C` antes de iniciar outra. |
+| `ENOENT` ao abrir um HTML | Confira se os cinco HTMLs estão em `paginas/`, conforme os caminhos de `res.sendFile()` no `app.js`. |
+| `ENOENT` ao gravar `errors.log` | Crie a pasta `logs` na raiz e confira a permissão de escrita. |
+| Pasta `logs` vazia | Nenhuma exceção pode ter sido registrada. Execute o teste com `abc`; validações comuns não gravam log automaticamente. |
+| Não é possível cadastrar um produto | Cadastre primeiro categoria e vendedor e use IDs existentes; o preço deve ser maior que zero. |
+| Não é possível excluir um produto com avaliações | Exclua primeiro as avaliações associadas ao produto de teste. |
+
+O `sync()` utilizado cria tabelas ausentes, sem `force: true`. Ele não apaga os dados a cada execução nem funciona como migração automática de estruturas antigas. Para uma avaliação em ambiente novo, utilize um banco criado especificamente para este projeto.
+
 
 ## Rotas
 
@@ -346,7 +489,7 @@ http://localhost:8081/produtos?categoriaId=1&precoMinimo=500
 | POST | /avaliacoes/alterar | id, usuario, nota, comentario | Alterar mantendo o produto associado |
 | POST | /avaliacoes/excluir | id | Excluir |
 
-Nos formulários de alteração e exclusão de avaliações, `id` recebe o valor de `_id` mostrado na consulta, sem aspas. Ele não deve ser confundido com `produtoId`.
+Nas requisições de alteração e exclusão de avaliações, `id` recebe o valor de `_id`. A interface preenche esse identificador automaticamente ao clicar em **Editar** ou **Excluir**. Ele não deve ser confundido com `produtoId`.
 
 As consultas GET recebem parâmetros por `req.query`. Os formulários POST enviam dados recebidos por `req.body`, com `express.urlencoded()`. Alteração e exclusão também utilizam POST, mantendo o padrão de formulários trabalhado nas aulas.
 
@@ -394,11 +537,11 @@ As datas são gravadas em UTC com `toISOString()`. Os novos registros são acres
 4. Consultar, alterar e filtrar o produto.
 5. Cadastrar uma avaliação usando o identificador do produto.
 6. Conferir o documento no MongoDB Compass.
-7. Alterar a nota e o comentário usando o `_id` da avaliação.
+7. Clicar em **Editar** na avaliação, alterar a nota e o comentário e salvar. A interface envia o `_id` correto.
 8. Tentar excluir o produto enquanto possui avaliação e conferir o bloqueio.
 9. Excluir a avaliação e depois excluir o produto de teste.
 10. Excluir a categoria e o vendedor de teste quando não possuírem produtos associados.
-11. Enviar `abc` no formulário de exclusão de avaliação e conferir a mensagem de ID inválido e o registro em `logs/errors.log`.
+11. Executar o comando `curl.exe` da etapa 13 de instalação para enviar `id=abc` à rota de exclusão de avaliação. Conferir HTTP 400 e o registro em `logs/errors.log`.
 
 O projeto não possui uma suíte de testes automatizados configurada. A verificação das funcionalidades é manual.
 
@@ -418,6 +561,16 @@ Os dados dos bancos não acompanham o repositório. Em uma instalação nova, pr
 
 ## Base do desenvolvimento
 
-O desenvolvimento utiliza o enunciado Projeto BACK-END e os materiais da disciplina sobre Node.js, Express, módulos CommonJS, Sequelize, relacionamentos, consultas e MongoDB com Mongoose.
+O projeto foi organizado a partir do enunciado Projeto BACK-END e dos conteúdos de Node.js, Express, módulos CommonJS, Sequelize, relacionamentos, consultas e MongoDB com Mongoose. O registro de erros utiliza uma implementação própria com a classe `RegistroErro` e os módulos nativos `fs` e `path`; essa escolha de implementação não é uma afirmação de que o mesmo código consta no material de aula.
 
-O projeto mantém formulários HTML simples, rotas em `app.js`, configurações em `config` e models em `models`.
+O projeto mantém as rotas em `app.js`, configurações em `config`, models em `models` e a interface Bancada em `paginas`. A interface utiliza HTML, CSS e JavaScript, sem framework de front-end; os scripts tratam consultas, tabelas, filtros e formulários.
+
+## Referências de instalação
+
+- [Downloads oficiais do Node.js](https://nodejs.org/pt-br/download).
+- [Requisito de Node.js do Mongoose 9](https://mongoosejs.com/docs/migrating_to_9.html).
+- [Instaladores do PostgreSQL para Windows](https://www.postgresql.org/download/windows/).
+- [Instalação do PostgreSQL no Windows pela EDB](https://www.enterprisedb.com/docs/dev-guides/deploy/windows/).
+- [Instalação do MongoDB Community 8.0 no Windows](https://www.mongodb.com/docs/v8.0/tutorial/install-mongodb-on-windows/).
+
+Os passos de instalação se referem ao Windows. Os nomes de botões podem variar conforme idioma e versão das ferramentas.

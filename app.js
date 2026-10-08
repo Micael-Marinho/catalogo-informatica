@@ -16,12 +16,12 @@ app.use(express.urlencoded({ extended: true }));
 
 // Página inicial.
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.join(__dirname, 'paginas', 'index.html'));
 });
 
 // Mostra o formulário de categorias.
 app.get('/categorias/cadastro', (req, res) => {
-    res.sendFile(path.join(__dirname, 'categorias.html'));
+    res.sendFile(path.join(__dirname, 'paginas', 'categorias.html'));
 });
 
 // Recebe o formulário e salva a categoria.
@@ -187,7 +187,7 @@ app.post('/categorias/excluir', async (req, res) => {
 
 // Mostra os formulários de vendedores.
 app.get('/vendedores/cadastro', (req, res) => {
-    res.sendFile(path.join(__dirname, 'vendedores.html'));
+    res.sendFile(path.join(__dirname, 'paginas', 'vendedores.html'));
 });
 
 // Cadastra um vendedor.
@@ -338,7 +338,7 @@ app.post('/vendedores/excluir', async (req, res) => {
 
 // Mostra o formulário de produtos.
 app.get('/produtos/cadastro', (req, res) => {
-    res.sendFile(path.join(__dirname, 'produtos.html'));
+    res.sendFile(path.join(__dirname, 'paginas', 'produtos.html'));
 });
 
 // Cadastra um produto.
@@ -698,7 +698,7 @@ app.post('/produtos/excluir', async (req, res) => {
 
 // Mostra o formulário de avaliações.
 app.get('/avaliacoes/cadastro', (req, res) => {
-    res.sendFile(path.join(__dirname, 'avaliacoes.html'));
+    res.sendFile(path.join(__dirname, 'paginas', 'avaliacoes.html'));
 });
 
 // Cadastra uma avaliação no MongoDB.

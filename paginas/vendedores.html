@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Catálogo acadêmico de produtos de informática e avaliações.">
+<title>Vendedores · Bancada</title>
+<!-- CSS e JavaScript estão no próprio HTML para funcionar com as rotas sendFile existentes. -->
+<style>
+/* Uma bancada clara: o destaque fica nos dados e nas ações de cada cadastro. */
+:root {
+    --paper:#f5f3ed;
+    --white:#fffefa;
+    --ink:#202c35;
+    --muted:#63717b;
+    --line:#d9ddd9;
+    --blue:#245dc5;
+    --orange:#c74c2b;
+    --green:#21724e;
+    --soft:#eaf0fa;
+    --radius:14px;
+}
+* {
+    box-sizing:border-box;
+}
+body {
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:Segoe UI,Arial,sans-serif;
+    font-size:15px;
+    line-height:1.55;
+}
+button,input,select,textarea {
+    font:inherit;
+}
+a {
+    color:var(--blue);
+}
+button,a,input,select,textarea {
+    -webkit-tap-highlight-color:transparent;
+}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible {
+    outline:3px solid #dd791e;
+    outline-offset:3px;
+}
+.skip {
+    position:absolute;
+    top:-70px;
+    left:20px;
+    z-index:10;
+    background:white;
+    padding:12px;
+}
+.skip:focus {
+    top:12px;
+}
+.shell {
+    max-width:1440px;
+    margin:auto;
+    padding:0 42px;
+}
+.topbar {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:24px;
+    padding:26px 0;
+    border-bottom:1px solid var(--line);
+}
+.brand {
+    text-decoration:none;
+    color:var(--ink);
+    display:flex;
+    gap:12px;
+    align-items:center;
+}
+.brand-mark {
+    width:40px;
+    height:40px;
+    background:var(--ink);
+    color:white;
+    display:grid;
+    place-items:center;
+    font-family:Consolas,monospace;
+    font-weight:700;
+    font-size:21px;
+    border-radius:8px;
+}
+.brand b {
+    font-size:23px;
+    letter-spacing:-1px;
+}
+.brand small {
+    display:block;
+    font-size:10px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-top:-3px;
+}
+.course {
+    font-size:11px;
+    letter-spacing:1.4px;
+    text-transform:uppercase;
+    text-align:right;
+    color:var(--muted);
+}
+.course strong {
+    display:block;
+    color:var(--ink);
+    font-size:12px;
+}
+.nav {
+    display:flex;
+    gap:6px;
+    padding:17px 0;
+    overflow:auto;
+}
+.nav a {
+    text-decoration:none;
+    white-space:nowrap;
+    color:var(--muted);
+    padding:9px 15px;
+    border-radius:7px;
+    font-weight:600;
+    font-size:13px;
+}
+.nav a:hover {
+    background:#e8e9e3;
+    color:var(--ink);
+}
+.nav a[aria-current=page] {
+    background:var(--ink);
+    color:white;
+}
+.nav span {
+    font-family:Consolas,monospace;
+    opacity:.5;
+    margin-right:7px;
+}
+.hero {
+    padding:34px 0 32px;
+    display:flex;
+    justify-content:space-between;
+    gap:24px;
+    align-items:flex-end;
+}
+.eyebrow {
+    font-family:Consolas,monospace;
+    font-size:11px;
+    color:var(--orange);
+    letter-spacing:1.8px;
+    text-transform:uppercase;
+    margin:0 0 12px;
+}
+.hero h1 {
+    font-size:clamp(32px,4vw,52px);
+    line-height:1.1;
+    letter-spacing:-2px;
+    margin:0 0 15px;
+    font-weight:650;
+}
+.hero p.description {
+    max-width:640px;
+    color:var(--muted);
+    margin:0;
+    font-size:15px;
+}
+.page-stamp {
+    border-left:2px solid var(--orange);
+    padding:3px 0 3px 16px;
+    min-width:190px;
+    font-size:12px;
+    color:var(--muted);
+}
+.page-stamp b {
+    display:block;
+    color:var(--ink);
+}
+.btn {
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    border:1px solid var(--line);
+    border-radius:7px;
+    background:var(--white);
+    padding:10px 16px;
+    text-decoration:none;
+    color:var(--ink);
+    cursor:pointer;
+    font-weight:600;
+    font-size:13px;
+    min-height:42px;
+}
+.btn:hover {
+    background:#eaece8;
+}
+.btn.primary {
+    background:var(--blue);
+    border-color:var(--blue);
+    color:white;
+}
+.btn.primary:hover {
+    background:#19499f;
+}
+.btn.danger {
+    color:#a33228;
+    border-color:#e8c7be;
+    background:#fff8f4;
+}
+.btn.small {
+    padding:6px 10px;
+    min-height:34px;
+    font-size:12px;
+}
+.btn:disabled {
+    opacity:.55;
+    cursor:wait;
+}
+.toolbar {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+    margin-bottom:18px;
+}
+.toolbar h2,.panel h2 {
+    font-size:18px;
+    letter-spacing:-.4px;
+    margin:0;
+}
+.toolbar p {
+    margin:4px 0 0;
+    color:var(--muted);
+    font-size:12px;
+}
+.button-row {
+    display:flex;
+    gap:8px;
+    align-items:center;
+    flex-wrap:wrap;
+}
+.panel {
+    background:var(--white);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:25px;
+}
+.workspace {
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 340px;
+    gap:24px;
+    align-items:start;
+}
+.workspace>*,.field {
+    min-width:0;
+}
+.form-panel {
+    border-top:3px solid var(--blue);
+}
+.form-panel .intro {
+    color:var(--muted);
+    font-size:12px;
+    margin:8px 0 22px;
+}
+.form-grid {
+    display:grid;
+    gap:16px;
+}
+.field label {
+    display:block;
+    font-size:12px;
+    font-weight:700;
+    margin-bottom:6px;
+}
+.field input,.field select,.field textarea {
+    display:block;
+    width:100%;
+    border:1px solid #bcc6c9;
+    border-radius:6px;
+    background:#fff;
+    padding:10px 11px;
+    color:var(--ink);
+    min-height:43px;
+}
+.field textarea {
+    resize:vertical;
+    min-height:94px;
+}
+.field small {
+    display:block;
+    color:var(--muted);
+    font-size:11px;
+    margin-top:5px;
+}
+.form-actions {
+    margin-top:22px;
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+}
+.required-note {
+    font-size:11px;
+    color:var(--muted);
+    margin:16px 0 0;
+}
+.filters {
+    display:flex;
+    flex-wrap:wrap;
+    align-items:flex-end;
+    gap:12px;
+    padding:17px;
+    background:#edf0e9;
+    border-radius:9px;
+    margin-bottom:20px;
+}
+.filters .field {
+    flex:1;
+    min-width:130px;
+}
+.filters input,.filters select {
+    font-size:13px;
+}
+.filters .filter-buttons {
+    display:flex;
+    gap:6px;
+}
+.table-wrap {
+    overflow-x:auto;
+}
+table {
+    width:100%;
+    border-collapse:collapse;
+    text-align:left;
+    font-size:13px;
+}
+th {
+    font-size:10px;
+    letter-spacing:1.1px;
+    text-transform:uppercase;
+    color:var(--muted);
+    padding:13px 12px;
+    border-bottom:1px solid var(--line);
+    white-space:nowrap;
+}
+td {
+    padding:17px 12px;
+    border-bottom:1px solid #e9ece7;
+    vertical-align:top;
+}
+tr:last-child td {
+    border-bottom:0;
+}
+tbody tr:hover {
+    background:#f8f9f4;
+}
+td.name {
+    font-weight:650;
+    min-width:145px;
+}
+td.name small {
+    display:block;
+    font-weight:400;
+    font-size:12px;
+    color:var(--muted);
+    margin-top:4px;
+    max-width:260px;
+    white-space:normal;
+    overflow-wrap:anywhere;
+}
+.id {
+    font-family:Consolas,monospace;
+    font-size:11px;
+    color:var(--muted);
+    overflow-wrap:anywhere;
+}
+.id.mongo {
+    display:block;
+    max-width:115px;
+}
+.badge {
+    display:inline-block;
+    padding:3px 8px;
+    font-size:11px;
+    border-radius:4px;
+    background:var(--soft);
+    color:var(--blue);
+}
+.actions {
+    display:flex;
+    gap:6px;
+    white-space:nowrap;
+}
+.empty {
+    text-align:center;
+    padding:48px 16px!important;
+    color:var(--muted);
+}
+.empty strong {
+    display:block;
+    color:var(--ink);
+    margin-bottom:6px;
+}
+.note {
+    font-size:12px;
+    color:var(--muted);
+    margin:18px 0 0;
+}
+.notice {
+    border-radius:8px;
+    padding:13px 16px;
+    margin:0 0 20px;
+    border:1px solid #b7d2c0;
+    background:#eef8f0;
+    color:#22583b;
+    overflow-wrap:anywhere;
+}
+.notice.error {
+    border-color:#e3b9ad;
+    background:#fff0e9;
+    color:#913b29;
+}
+.notice button {
+    float:right;
+    border:0;
+    background:none;
+    font-size:20px;
+    cursor:pointer;
+    color:inherit;
+    margin-left:16px;
+}
+[hidden] {
+    display:none!important;
+}
+.stats {
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:16px;
+    margin-bottom:28px;
+}
+.stat {
+    background:var(--white);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:22px;
+    text-decoration:none;
+    color:var(--ink);
+}
+.stat small {
+    font-size:11px;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:1px;
+}
+.stat strong {
+    display:block;
+    font-size:37px;
+    line-height:1.2;
+    font-weight:500;
+    margin:10px 0;
+}
+.stat span {
+    font-size:12px;
+    color:var(--blue);
+}
+.dashboard {
+    display:grid;
+    grid-template-columns:minmax(0,1.8fr) minmax(260px,1fr);
+    gap:24px;
+}
+.feature {
+    background:var(--ink);
+    color:#f5f3ed;
+    border-radius:14px;
+    padding:28px;
+    position:relative;
+    overflow:hidden;
+}
+.feature .eyebrow {
+    color:#ffb293;
+}
+.feature h2 {
+    font-size:30px;
+    line-height:1.15;
+    letter-spacing:-1px;
+    margin:0 0 16px;
+}
+.feature p {
+    color:#c7d0d6;
+    font-size:13px;
+}
+.feature .btn {
+    margin-top:14px;
+}
+.circuit {
+    margin:24px 0 8px;
+    border:1px solid #5c6e78;
+    padding:18px;
+    border-radius:10px;
+    font-family:Consolas,monospace;
+    display:flex;
+    align-items:center;
+    justify-content:space-around;
+    gap:12px;
+}
+.circuit b {
+    color:#ffb293;
+    font-size:24px;
+}
+.steps {
+    list-style:none;
+    padding:0;
+    margin:20px 0 0;
+    counter-reset:step;
+}
+.steps li {
+    padding:15px 0;
+    border-top:1px solid var(--line);
+    display:flex;
+    gap:12px;
+    font-size:13px;
+}
+.steps li:before {
+    counter-increment:step;
+    content:'0' counter(step);
+    color:var(--orange);
+    font-family:Consolas,monospace;
+}
+.steps strong {
+    display:block;
+}
+.steps small {
+    color:var(--muted);
+}
+.rating {
+    color:#a85c05;
+    font-weight:700;
+    white-space:nowrap;
+}
+.status-text {
+    font-size:12px;
+    color:var(--muted);
+}
+footer {
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    border-top:1px solid var(--line);
+    margin-top:45px;
+    padding:22px 0 30px;
+    font-size:11px;
+    color:var(--muted);
+}
+.foot-mark {
+    font-family:Consolas,monospace;
+    color:var(--orange);
+}
+@media(min-width:1450px) {
+    .shell {
+        padding:0 48px;
+    }
+}
+@media(max-width:1100px) {
+    .workspace {
+        grid-template-columns:minmax(0,1fr);
+    }
+    .form-panel {
+        max-width:none;
+    }
+    .form-grid {
+        grid-template-columns:1fr 1fr;
+    }
+    .field.wide {
+        grid-column:1/-1;
+    }
+    .dashboard {
+        grid-template-columns:1fr;
+    }
+    .page-stamp {
+        display:none;
+    }
+}
+@media(max-width:640px) {
+    .shell {
+        padding:0 18px;
+    }
+    .topbar {
+        padding:20px 0;
+    }
+    .course {
+        display:none;
+    }
+    .hero {
+        padding:23px 0;
+    }
+    .hero h1 {
+        letter-spacing:-1px;
+    }
+    .panel {
+        padding:17px;
+    }
+    .stats {
+        grid-template-columns:1fr 1fr;
+        gap:10px;
+    }
+    .stat {
+        padding:16px;
+    }
+    .stat strong {
+        font-size:30px;
+    }
+    .nav a {
+        padding:8px 10px;
+    }
+    .form-grid {
+        grid-template-columns:1fr;
+    }
+    .filters {
+        padding:13px;
+    }
+    .filters .field {
+        flex-basis:100%;
+    }
+    .toolbar {
+        align-items:flex-start;
+    }
+    .toolbar .button-row {
+        justify-content:flex-end;
+    }
+    footer {
+        flex-direction:column;
+    }
+    .feature {
+        padding:22px;
+    }
+}
+@media(prefers-reduced-motion:no-preference) {
+    .btn,.nav a {
+        transition:background .15s ease;
+    }
+    html {
+        scroll-behavior:smooth;
+    }
+}
+</style>
+</head>
+<body data-pagina="vendedores">
+<a class="skip" href="#conteudo">Ir para o conteúdo</a>
+<div class="shell">
+<header>
+<div class="topbar">
+<a class="brand" href="/" aria-label="Bancada, página inicial">
+<span class="brand-mark" aria-hidden="true">b.</span>
+<span>
+<b>bancada</b>
+<small>Catálogo de informática</small>
+</span>
+</a>
+<div class="course">
+<strong>Programação Web Back-End</strong>Projeto acadêmico · UTFPR</div>
+</div>
+<nav class="nav" aria-label="Navegação principal">
+<a href="/" >
+<span>01</span>Visão geral</a>
+<a href="/categorias/cadastro" >
+<span>02</span>Categorias</a>
+<a href="/vendedores/cadastro" aria-current="page" >
+<span>03</span>Vendedores</a>
+<a href="/produtos/cadastro" >
+<span>04</span>Produtos</a>
+<a href="/avaliacoes/cadastro" >
+<span>05</span>Avaliações</a>
+</nav>
+</header>
+<main id="conteudo">
+<div class="hero">
+<div>
+<p class="eyebrow">03 / CADASTROS</p>
+<h1>Quem está por trás<br>dos produtos.</h1>
+<p class="description">Mantenha os nomes dos vendedores organizados para associar cada produto à sua origem.</p>
+</div>
+<div class="page-stamp">
+<b>Peças, pessoas e opiniões.</b>Um catálogo feito para consultar.</div>
+</div>
+<div id="aviso" class="notice" role="status" aria-live="polite" hidden>
+<button id="fechar-aviso" type="button" aria-label="Fechar mensagem">×</button>
+<span id="mensagem">
+</span>
+</div>
+<noscript>
+<p class="notice error">Ative o JavaScript para usar listas, filtros e edição nesta interface.</p>
+</noscript>
+<div class="workspace">
+<section class="panel">
+<div class="toolbar">
+<div>
+<h2>Vendedores cadastrados</h2>
+<p id="quantidade">Consultando…</p>
+</div>
+<div class="button-row">
+<button id="atualizar" class="btn" type="button">Atualizar</button>
+<button id="novo" class="btn primary" type="button">+ Novo</button>
+</div>
+</div>
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th scope="col">ID</th>
+<th scope="col">Nome</th>
+<th scope="col">Ações</th>
+</tr>
+</thead>
+<tbody id="linhas">
+<tr>
+<td colspan="3" class="empty">Carregando registros…</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="note">Categorias e vendedores com produtos vinculados precisam ter esses vínculos resolvidos antes da exclusão.</p>
+</section>
+<aside class="panel form-panel" id="painel-form">
+<p class="eyebrow">Ficha de cadastro</p>
+<h2 id="titulo-form">Novo registro</h2>
+<p class="intro" id="modo-form">Preencha os dados para adicionar um registro.</p>
+<form id="cadastro" action="/vendedores/cadastrar" method="POST">
+<input type="hidden" name="id" value="">
+<div class="form-grid">
+<div class="field wide">
+<label for="nome">Nome do vendedor *</label>
+<input id="nome" name="nome" type="text" required maxlength="255" placeholder="Ex.: Loja Exemplo Informática">
+</div>
+</div>
+<div class="form-actions">
+<button id="salvar" class="btn primary" type="submit">Cadastrar</button>
+<button id="cancelar" class="btn" type="button" hidden>Cancelar edição</button>
+</div>
+<p class="required-note">* Campos obrigatórios. Confira os dados antes de salvar.</p>
+</form>
+</aside>
+</div>
+</main>
+<footer>
+<span>
+<span class="foot-mark">[ b. ]</span> Bancada · Catálogo de Produtos de Informática com Avaliações</span>
+<span>Projeto acadêmico · Consultar, organizar, avaliar.</span>
+</footer>
+</div>
+<script>
+/* As rotas continuam no app.js. Esta camada só organiza a interação no navegador. */
+const recursos = {
+    categorias: { singular: 'categoria', campos: ['nome'] },
+    vendedores: { singular: 'vendedor', campos: ['nome'] },
+    produtos: { singular: 'produto', campos: ['nome', 'descricao', 'preco', 'categoriaId', 'vendedorId'] },
+    avaliacoes: { singular: 'avaliação', campos: ['produtoId', 'usuario', 'nota', 'comentario'] }
+};
+const pagina = document.body.dataset.pagina;
+let registros = [];
+let referencias = { categorias: [], vendedores: [], produtos: [] };
+const moeda = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+const aviso = document.getElementById('aviso');
+
+function notificar(mensagem, erro = false) {
+    aviso.classList.toggle('error', erro);
+    document.getElementById('mensagem').textContent = mensagem;
+    aviso.hidden = false;
+}
+document.getElementById('fechar-aviso').addEventListener('click', () => { aviso.hidden = true; });
+
+// O servidor devolve HTML nas ações e JSON nas consultas. Cada resposta tem seu tratamento.
+async function consultar(caminho) {
+    const resposta = await fetch(caminho, { cache: 'no-store' });
+    if (!resposta.ok) {
+        const texto = await resposta.text();
+        throw new Error(texto || 'Não foi possível consultar os dados.');
+    }
+    return resposta.json();
+}
+function mensagemResposta(texto) {
+    const documento = new DOMParser().parseFromString(texto, 'text/html');
+    const titulo = documento.querySelector('h1');
+    return (titulo ? titulo.textContent : documento.body.textContent).trim();
+}
+async function enviar(caminho, dados) {
+    const resposta = await fetch(caminho, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+        body: new URLSearchParams(dados)
+    });
+    const mensagem = mensagemResposta(await resposta.text());
+    if (!resposta.ok) throw new Error(mensagem || 'Não foi possível concluir a operação.');
+    return mensagem || 'Operação concluída.';
+}
+function falha(erro) {
+    notificar(erro.message === 'Failed to fetch'
+        ? 'Não foi possível acessar o servidor. Confira se node app.js está em execução e tente novamente.'
+        : erro.message, true);
+}
+function elemento(tag, texto, classe) {
+    const item = document.createElement(tag);
+    if (texto !== undefined) item.textContent = texto;
+    if (classe) item.className = classe;
+    return item;
+}
+function nomeReferencia(tipo, id) {
+    const registro = referencias[tipo].find(item => String(item.id) === String(id));
+    return registro ? registro.nome : `ID ${id}`;
+}
+function preencherSelect(id, lista, inicial) {
+    const select = document.getElementById(id);
+    if (!select) return;
+    const anterior = select.value;
+    select.replaceChildren();
+    const vazio = elemento('option', inicial);
+    vazio.value = '';
+    select.append(vazio);
+    lista.forEach(item => {
+        const opcao = elemento('option', `${item.nome} · #${item.id}`);
+        opcao.value = item.id;
+        select.append(opcao);
+    });
+    if (lista.some(item => String(item.id) === anterior)) select.value = anterior;
+}
+async function carregarReferencias() {
+    if (pagina === 'produtos') {
+        [referencias.categorias, referencias.vendedores] = await Promise.all([
+            consultar('/categorias'), consultar('/vendedores')
+        ]);
+        preencherSelect('categoriaId', referencias.categorias, 'Selecione uma categoria');
+        preencherSelect('vendedorId', referencias.vendedores, 'Selecione um vendedor');
+        preencherSelect('filtroCategoria', referencias.categorias, 'Todas as categorias');
+        document.getElementById('ajuda-vinculos').hidden = referencias.categorias.length > 0 && referencias.vendedores.length > 0;
+    }
+    if (pagina === 'avaliacoes') {
+        referencias.produtos = await consultar('/produtos');
+        preencherSelect('produtoId', referencias.produtos, 'Selecione um produto');
+        preencherSelect('filtroProduto', referencias.produtos, 'Todos os produtos');
+        document.getElementById('ajuda-vinculos').hidden = referencias.produtos.length > 0;
+    }
+}
+function mensagemTabela(titulo, detalhe) {
+    const corpo = document.getElementById('linhas');
+    corpo.replaceChildren();
+    const linha = elemento('tr');
+    const celula = elemento('td', undefined, 'empty');
+    celula.colSpan = document.querySelectorAll('thead th').length;
+    celula.append(elemento('strong', titulo), elemento('span', detalhe));
+    linha.append(celula); corpo.append(linha);
+}
+// Dados digitados pelos usuários entram como texto, nunca como HTML executável.
+function desenharTabela() {
+    const corpo = document.getElementById('linhas');
+    corpo.replaceChildren();
+    document.getElementById('quantidade').textContent = `${registros.length} registro${registros.length === 1 ? '' : 's'} nesta consulta`;
+    if (!registros.length) {
+        mensagemTabela('Nenhum registro por aqui.', 'Cadastre um item ou revise os filtros da consulta.');
+        return;
+    }
+    registros.forEach(registro => {
+        const linha = elemento('tr');
+        const id = registro._id || registro.id;
+        const celulaId = elemento('td');
+        celulaId.append(elemento('span', String(id), pagina === 'avaliacoes' ? 'id mongo' : 'id'));
+        linha.append(celulaId);
+        if (pagina === 'categorias' || pagina === 'vendedores') {
+            linha.append(elemento('td', registro.nome, 'name'));
+        } else if (pagina === 'produtos') {
+            const nome = elemento('td', registro.nome, 'name');
+            if (registro.descricao) nome.append(elemento('small', registro.descricao));
+            linha.append(nome, elemento('td', nomeReferencia('categorias', registro.categoriaId)),
+                elemento('td', nomeReferencia('vendedores', registro.vendedorId)),
+                elemento('td', moeda.format(Number(registro.preco))));
+        } else {
+            const produto = elemento('td', nomeReferencia('produtos', registro.produtoId), 'name');
+            produto.append(elemento('small', registro.comentario));
+            linha.append(produto, elemento('td', registro.usuario), elemento('td', `${registro.nota} / 5`, 'rating'));
+        }
+        const acoes = elemento('td');
+        const grupo = elemento('div', undefined, 'actions');
+        const editar = elemento('button', 'Editar', 'btn small');
+        editar.type = 'button';
+        editar.setAttribute('aria-label', `Editar ${registro.nome || 'avaliação de ' + registro.usuario}`);
+        editar.addEventListener('click', () => editarRegistro(registro));
+        const excluir = elemento('button', 'Excluir', 'btn small danger');
+        excluir.type = 'button';
+        excluir.setAttribute('aria-label', `Excluir ${registro.nome || 'avaliação de ' + registro.usuario}`);
+        excluir.addEventListener('click', () => excluirRegistro(registro, excluir));
+        grupo.append(editar, excluir); acoes.append(grupo); linha.append(acoes); corpo.append(linha);
+    });
+}
+async function carregarLista() {
+    document.getElementById('quantidade').textContent = 'Consultando…';
+    try {
+        const filtros = document.getElementById('filtros');
+        let url = `/${pagina}`;
+        if (filtros) {
+            const params = new URLSearchParams(new FormData(filtros));
+            if (pagina === 'produtos' && params.get('id')) {
+                url = `/produtos/buscar?id=${encodeURIComponent(params.get('id'))}`;
+            } else {
+                params.delete('id');
+                url += `?${params.toString()}`;
+            }
+        }
+        const resultado = await consultar(url);
+        registros = Array.isArray(resultado) ? resultado : [resultado];
+        desenharTabela();
+    } catch (erro) {
+        registros = [];
+        mensagemTabela('A consulta não foi concluída.', 'Confira a mensagem acima e tente novamente.');
+        document.getElementById('quantidade').textContent = 'Consulta indisponível';
+        throw erro;
+    }
+}
+function novoRegistro(focar = false) {
+    const form = document.getElementById('cadastro');
+    form.reset(); form.elements.id.value = '';
+    if (pagina === 'avaliacoes') form.elements.produtoId.disabled = false;
+    document.getElementById('titulo-form').textContent = `Nova ${recursos[pagina].singular}`;
+    if (pagina === 'produtos' || pagina === 'vendedores') document.getElementById('titulo-form').textContent = `Novo ${recursos[pagina].singular}`;
+    document.getElementById('salvar').textContent = 'Cadastrar';
+    document.getElementById('cancelar').hidden = true;
+    document.getElementById('modo-form').textContent = 'Preencha os dados para adicionar um registro.';
+    if (focar) { document.getElementById('painel-form').scrollIntoView({block:'start'}); form.querySelector('input:not([type=hidden]),select').focus(); }
+}
+function editarRegistro(registro) {
+    const form = document.getElementById('cadastro');
+    form.reset(); form.elements.id.value = registro._id || registro.id;
+    recursos[pagina].campos.forEach(campo => {form.elements[campo].value = registro[campo] ?? '';});
+    if (pagina === 'avaliacoes') form.elements.produtoId.disabled = true;
+    document.getElementById('titulo-form').textContent = `Editar ${recursos[pagina].singular}`;
+    document.getElementById('salvar').textContent = 'Salvar alteração';
+    document.getElementById('cancelar').hidden = false;
+    document.getElementById('modo-form').textContent = pagina === 'avaliacoes'
+        ? 'O produto desta avaliação permanece o mesmo. Revise o nome, a nota e o comentário.'
+        : 'Os dados atuais estão preenchidos. Altere o que precisar e salve.';
+    document.getElementById('painel-form').scrollIntoView({block:'start'});
+    form.querySelector('input:not([type=hidden]):not(:disabled),textarea').focus();
+}
+async function excluirRegistro(registro, botao) {
+    const nome = registro.nome || `avaliação de ${registro.usuario}`;
+    if (!window.confirm(`Excluir ${nome}? Essa ação não pode ser desfeita.`)) return;
+    botao.disabled = true;
+    try {
+        const mensagem = await enviar(`/${pagina}/excluir`, {id: registro._id || registro.id});
+        if (String(document.getElementById('cadastro').elements.id.value) === String(registro._id || registro.id)) novoRegistro();
+        notificar(mensagem);
+        await carregarLista();
+    } catch (erro) { falha(erro); }
+    finally {botao.disabled = false;}
+}
+async function iniciarCadastro() {
+    const form = document.getElementById('cadastro');
+    novoRegistro();
+    form.addEventListener('submit', async evento => {
+        evento.preventDefault();
+        if (!form.reportValidity()) return;
+        const botao = document.getElementById('salvar');
+        const textoAnterior = botao.textContent;
+        botao.disabled = true; botao.textContent = 'Salvando…';
+        try {
+            const dados = new FormData(form);
+            const acao = dados.get('id') ? 'alterar' : 'cadastrar';
+            const mensagem = await enviar(`/${pagina}/${acao}`, dados);
+            novoRegistro();
+            notificar(mensagem);
+            await carregarLista();
+        } catch (erro) { falha(erro); }
+        finally { botao.disabled = false; botao.textContent = form.elements.id.value ? textoAnterior : 'Cadastrar'; }
+    });
+    document.getElementById('cancelar').addEventListener('click', () => novoRegistro());
+    document.getElementById('novo').addEventListener('click', () => novoRegistro(true));
+    document.getElementById('atualizar').addEventListener('click', async () => {
+        try { await carregarReferencias(); await carregarLista(); } catch (erro) { falha(erro); }
+    });
+    const filtros = document.getElementById('filtros');
+    if (filtros) {
+        filtros.addEventListener('submit', evento => {evento.preventDefault(); carregarLista().catch(falha);});
+        document.getElementById('limpar').addEventListener('click', () => {filtros.reset();carregarLista().catch(falha);});
+    }
+    try { await carregarReferencias(); await carregarLista(); }
+    catch(erro) { mensagemTabela('Não foi possível carregar os dados.', 'Confira a conexão e use Atualizar para tentar novamente.'); falha(erro); }
+}
+async function iniciarInicio() {
+    try {
+        const [categorias,vendedores,produtos,avaliacoes] = await Promise.all([
+            consultar('/categorias'),consultar('/vendedores'),consultar('/produtos'),consultar('/avaliacoes')
+        ]);
+        const listas = {categorias,vendedores,produtos,avaliacoes};
+        Object.keys(listas).forEach(nome => document.getElementById(`total-${nome}`).textContent = listas[nome].length);
+        document.getElementById('situacao').textContent = 'Consulta realizada às ' + new Date().toLocaleTimeString('pt-BR');
+        const corpo = document.getElementById('resumo-produtos'); corpo.replaceChildren();
+        if (!produtos.length) {
+            const tr=elemento('tr'),td=elemento('td','Seu catálogo está vazio. Comece pelos cadastros de categoria e vendedor.','empty');td.colSpan=3;tr.append(td);corpo.append(tr);
+        }
+        produtos.slice(0,5).forEach(p => {
+            const tr=elemento('tr');
+            const cat=categorias.find(c=>String(c.id)===String(p.categoriaId));
+            tr.append(elemento('td',p.nome,'name'),elemento('td',cat?cat.nome:`ID ${p.categoriaId}`),elemento('td',moeda.format(Number(p.preco))));corpo.append(tr);
+        });
+    } catch(erro) {document.getElementById('situacao').textContent='Dados indisponíveis. Tente atualizar a página.';falha(erro);}
+}
+if (pagina === 'inicio') iniciarInicio(); else iniciarCadastro();
+
+</script>
+</body>
+</html>
